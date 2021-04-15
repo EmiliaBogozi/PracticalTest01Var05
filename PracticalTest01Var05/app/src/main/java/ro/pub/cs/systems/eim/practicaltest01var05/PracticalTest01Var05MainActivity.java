@@ -2,7 +2,10 @@ package ro.pub.cs.systems.eim.practicaltest01var05;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,10 +19,13 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
     private TextView number_of_buttons_pressed;
     private int clicks;
 
+    private int serviceStatus = Constants.SERVICE_STOPPED;
+
     private ButtonClickListener buttonClickListener = new ButtonClickListener();
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private IntentFilter intentFilter = new IntentFilter();
 
     private class ButtonClickListener implements View.OnClickListener {
-
         @Override
         public void onClick(View v) {
             String text = number_of_buttons_pressed.getText().toString();
@@ -58,6 +64,18 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
                 clicks = 0;
                 number_of_buttons_pressed.setText("");
             }
+            if(clicks > Constants.NUMBER_OF_CLICKS_THRESHOLD && serviceStatus == Constants.SERVICE_STOPPED) {
+                Intent intent = new Intent(getApplicationContext(), PracticalTest01Var05Service.class);
+                intent.putExtra(Constants.MESSAGE1, "Top Left");
+                intent.putExtra(Constants.MESSAGE2, "Top Right");
+                intent.putExtra(Constants.MESSAGE3, "Center");
+                intent.putExtra(Constants.MESSAGE4, "Bottom Left");
+                intent.putExtra(Constants.MESSAGE5, "Bottom Right");
+
+                getApplicationContext().startService(intent);
+
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
         }
     }
 
@@ -90,6 +108,8 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
 
         navigate_to_secondary_activity = (Button)findViewById(R.id.navigateToSecondaryActivity);
         navigate_to_secondary_activity.setOnClickListener(buttonClickListener);
+
+        intentFilter.addAction(Constants.INTENT_ACTION);
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -131,12 +151,12 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(Constants.TAG, "onResume() method was invoked");
-        //registerReceiver(messageBroadcastReceiver, intentFilter);
+        registerReceiver(messageBroadcastReceiver, intentFilter);
     }
 
     @Override
     protected void onPause() {
-        //unregisterReceiver(messageBroadcastReceiver);
+        unregisterReceiver(messageBroadcastReceiver);
         super.onPause();
         Log.d(Constants.TAG, "onPause() method was invoked");
     }
@@ -145,5 +165,20 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(Constants.TAG, "onDestroy() method was invoked");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == Constants.SECONDARY_ACTIVITY_REQUEST_CODE) {
+            Toast.makeText(this, "The activity returned with result " + resultCode, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.TAG, intent.getStringExtra(Constants.BROADCAST_RECEIVER_EXTRA));
+        }
     }
 }
