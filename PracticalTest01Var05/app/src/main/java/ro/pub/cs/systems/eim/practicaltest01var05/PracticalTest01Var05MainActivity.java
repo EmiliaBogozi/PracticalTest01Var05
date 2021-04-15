@@ -50,6 +50,14 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
                 text = text + "Bottom Right";
                 number_of_buttons_pressed.setText(text);
             }
+            if(v.getId() == R.id.navigateToSecondaryActivity) {
+                Intent intent = new Intent(getApplicationContext(), PracticalTest01Var05SecondaryActivity.class);
+                intent.putExtra(Constants.DIRECTIONS, text);
+                startActivityForResult(intent, Constants.SECONDARY_ACTIVITY_REQUEST_CODE);
+
+                clicks = 0;
+                number_of_buttons_pressed.setText("");
+            }
         }
     }
 

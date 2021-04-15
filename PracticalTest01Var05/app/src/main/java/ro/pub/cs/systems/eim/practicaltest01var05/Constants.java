@@ -7,5 +7,5 @@ public interface Constants {
     final public static String BROADCAST_RECEIVER_EXTRA = "brodcast";
 
     final public static String COUNT_CLICKS = "CountClicks";
-
+    final public static String DIRECTIONS = "directions";
 }
