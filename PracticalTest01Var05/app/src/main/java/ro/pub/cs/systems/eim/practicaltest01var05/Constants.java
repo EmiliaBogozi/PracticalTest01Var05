@@ -6,4 +6,6 @@ public interface Constants {
     final public static String INTENT_ACTION = "ACTION";
     final public static String BROADCAST_RECEIVER_EXTRA = "brodcast";
 
+    final public static String COUNT_CLICKS = "CountClicks";
+
 }
